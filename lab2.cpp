@@ -3,20 +3,28 @@
 #include <cmath>
 #include <iomanip>
 
-std::vector<std::vector<double>> MatricesMultiplication(const std::vector<std::vector<double>>& firstMatrix, const std::vector<std::vector<double>>& secondMatrix);
+std::vector<std::vector<double>> MatricesMultiplication(const std::vector<std::vector<double>> &firstMatrix, const std::vector<std::vector<double>> &secondMatrix);
 std::vector<std::vector<double>> GaussAlgoInverseMatrix(const std::vector<std::vector<double>> &A);
 std::vector<std::vector<double>> ReturnUnitMatrix(size_t size);
-void PrintMatrix(const std::vector<std::vector<double>>& M);
+std::vector<std::vector<double>> ReturnHilbertMatrix(size_t size);
+std::vector<std::vector<double>> ReturnLeftMatrix(const std::vector<std::vector<double>>& H);
+std::vector<std::vector<double>> ReturnRightMatrix(const std::vector<std::vector<double>>& H);
+double MatrixRowsNorm(const std::vector<std::vector<double>> &M);
+void PrintMatrix(const std::vector<std::vector<double>> &M);
 int digitsQuantity(int number);
 
 int main() {
-	std::vector<std::vector<double>> test = { {1, 2}, {3, 4} };
-	//std::vector<std::vector<double>> test2 = { {-2, 1}, {1.5, -0.5} };
+	const size_t size = 5;
+	std::vector<std::vector<double>> test = ReturnHilbertMatrix(size);
 	std::vector<std::vector<double>> inv = GaussAlgoInverseMatrix(test);
+	std::cout << "Regular:" << std::endl;
+	PrintMatrix(test);
 	std::cout << "Inverted:" << std::endl;
 	PrintMatrix(inv);
-	std::cout << "Check: (must be unit)" << std::endl;
-	PrintMatrix(MatricesMultiplication(test, inv));
+	std::cout << "Left:" << std::endl;
+	PrintMatrix(ReturnLeftMatrix(test));
+	std::cout << "Right:" << std::endl;
+	PrintMatrix(ReturnRightMatrix(test));
 }
 
 std::vector<std::vector<double>> MatricesMultiplication(const std::vector<std::vector<double>> &firstMatrix, const std::vector<std::vector<double>> &secondMatrix) {
@@ -34,8 +42,6 @@ std::vector<std::vector<double>> MatricesMultiplication(const std::vector<std::v
 	return result;
 }
 
-
-//Wrong algo, redo
 std::vector<std::vector<double>> GaussAlgoInverseMatrix(const std::vector<std::vector<double>> &A) {
 	std::vector<std::vector<double>> enteredMatrix = A;
 	std::vector<std::vector<double>> result = ReturnUnitMatrix(enteredMatrix.size());
@@ -101,26 +107,56 @@ std::vector<std::vector<double>> ReturnUnitMatrix(size_t size) {
 	return (result);
 }
 
+std::vector<std::vector<double>> ReturnHilbertMatrix(size_t size) {
+	std::vector<std::vector<double>> result;
+	for (int i = 0; i < size; i++) {
+		std::vector<double> empty;
+		result.push_back(empty);
+		for (int j = 0; j < size; j++) {
+			double divisor = static_cast<double>((i + 1) + (j + 1) - 1);
+			result[i].push_back(1.0 / divisor);
+		}
+	}
+	return result;
+}
+
+std::vector<std::vector<double>> ReturnLeftMatrix(const std::vector<std::vector<double>>& H) {
+	std::vector<std::vector<double>> invH = GaussAlgoInverseMatrix(H);
+	std::vector<std::vector<double>> result = MatricesMultiplication(invH, H);
+	std::vector<std::vector<double>> unit = ReturnUnitMatrix(H.size());
+	for (int i = 0; i < H.size(); i++) {
+		for (int j = 0; j < H[0].size(); j++) {
+			result[i][j] -= unit[i][j];
+		}
+	}
+	return result;
+}
+
+std::vector<std::vector<double>> ReturnRightMatrix(const std::vector<std::vector<double>>& H) {
+	std::vector<std::vector<double>> invH = GaussAlgoInverseMatrix(H);
+	std::vector<std::vector<double>> result = MatricesMultiplication(H, invH);
+	std::vector<std::vector<double>> unit = ReturnUnitMatrix(H.size());
+	for (int i = 0; i < H.size(); i++) {
+		for (int j = 0; j < H[0].size(); j++) {
+			result[i][j] -= unit[i][j];
+		}
+	}
+	return result;
+}
+
+double MatrixRowsNorm(const std::vector<std::vector<double>>& M) {
+	std::vector<double> eachRowSum;
+	for (int i = 0; i < M.size(); i++) {
+		double sum = 0;
+		for (int j = 0; j < M[0].size(); j++) {
+			sum += std::abs(M[i][j]);
+		}
+		eachRowSum.push_back(sum);
+	}
+	return *std::max_element(eachRowSum.begin(), eachRowSum.end());
+}
+
 void PrintMatrix(const std::vector<std::vector<double>> &M) {
-	//std::vector<int> columnsLength;
-	//for (int j = 0; j < M[0].size(); j++) {
-	//	int length = 0;
-
-	//	for (int i = 0; i < M.size(); i++) {
-	//		int numLength = digitsQuantity(M[i][j]);
-	//		if (numLength > length) {
-	//			length = numLength;
-	//		}
-	//	}
-	//	columnsLength.push_back(length);
-	//}
-
-	//for (int i = 0; i < M.size(); i++) {
-	//	for (int j = 0; j < M[0].size(); j++) {
-	//		std::cout << (j == 0 ? "\n| " : "") << std::setw(columnsLength[j]) << M[i][j] << (j == M[0].size() - 1 ? " |" : " ");
-	//	}
-	//}
-	//std::cout << '\n';
 	for (int i = 0; i < M.size(); i++) {
 		for (int j = 0; j < M[0].size(); j++) {
 			std::cout << (j == 0 ? "\n| " : "") << std::setw(8) << M[i][j] << (j == M[0].size() - 1 ? " |" : " ") << "\t";
