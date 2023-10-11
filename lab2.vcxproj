@@ -130,8 +130,12 @@
   <ItemGroup>
     <ClCompile Include="FileWork.cpp" />
     <ClCompile Include="lab2.cpp" />
+    <ClCompile Include="matrices.cpp" />
     <ClCompile Include="menu.cpp" />
+    <ClCompile Include="tests.cpp" />
+    <ClInclude Include="matrices.h" />
     <ClInclude Include="menu.h" />
+    <ClInclude Include="tests.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileWork.h" />
