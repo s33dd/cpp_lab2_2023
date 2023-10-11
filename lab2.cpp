@@ -1,5 +1,6 @@
 ﻿#include "menu.h"
 #include "FileWork.h"
+#include "tests.h"
 #include "matrices.h"
 
 void ManualInput(size_t* a, size_t* b);
@@ -13,7 +14,8 @@ int main() {
     menu.StartInformation();
     bool isExit = false;
     if (menu.ModularTestsAsk() == Answer::YES) {
-        //Add tests
+		Tests t = Tests();
+		t.MakeTests();
     }
     while (!isExit) {
         bool isFileInput = false;
