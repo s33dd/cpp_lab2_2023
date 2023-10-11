@@ -18,7 +18,6 @@ void PrintMatrix(const std::vector<std::vector<double>> &M);
 void DrawChart(std::vector<int> x, std::vector<double> y, std::ostream &stream);
 
 int main() {
-	setlocale(LC_CTYPE, "rus");
 	size_t leftBorder = 0;
 	size_t rightBorder = 0;
 
