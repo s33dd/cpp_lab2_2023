@@ -3,6 +3,7 @@
 #include "menu.h"
 #include "FileWork.h"
 
+void ManualInput(size_t* a, size_t* b);
 std::vector<std::vector<double>> MatricesMultiplication(const std::vector<std::vector<double>> &firstMatrix, const std::vector<std::vector<double>> &secondMatrix);
 std::vector<std::vector<double>> GaussAlgoInverseMatrix(const std::vector<std::vector<double>> &A);
 std::vector<std::vector<double>> ReturnUnitMatrix(size_t size);
@@ -15,6 +16,9 @@ int digitsQuantity(int number);
 void drawGraph(std::vector<int> x, std::vector<double> y);
 
 int main() {
+	size_t leftBorder = 0;
+	size_t rightBorder = 0;
+
     Menu menu{};
     menu.StartInformation();
     bool isExit = false;
@@ -43,7 +47,7 @@ int main() {
             break;
         }
         case InputType::MANUAL: {
-            //Add input
+			ManualInput(&leftBorder, &rightBorder);
             break;
         }
         }
@@ -139,6 +143,38 @@ int main() {
             isExit = false;
         }
     }
+}
+
+void ManualInput(size_t* a, size_t* b) {
+	bool isErrors = true;
+	int input;
+	while (isErrors) {
+		std::cout << std::endl << "Enter left border (matrix dimension): ";
+		input = Menu::GetInput<int>();
+		if (input <= 0) {
+			isErrors = true;
+			std::cout << "Dimension can`t be less or equal zero";
+		} else {
+			isErrors = false;
+		}
+	}
+	*a = static_cast<size_t>(input);
+	isErrors = true;
+	while (isErrors) {
+		std::cout << std::endl << "Enter right border (matrix dimension): ";
+		input = Menu::GetInput<int>();
+		if (input <= 0) {
+			isErrors = true;
+			std::cout << std::endl << "Dimension can`t be less or equal zero";
+		} else {
+			if (input <= *a) {
+				std::cout << std::endl << "Right border can`t be lower or equal left border";
+			} else {
+				isErrors = false;
+			}
+		}
+	}
+	*b = static_cast<size_t>(input);
 }
 
 std::vector<std::vector<double>> MatricesMultiplication(const std::vector<std::vector<double>> &firstMatrix, const std::vector<std::vector<double>> &secondMatrix) {
@@ -294,6 +330,4 @@ void drawGraph(std::vector<int> x, std::vector<double> y) {
 		}
 		table.push_back(rows);
 	}
-
-	
 }
