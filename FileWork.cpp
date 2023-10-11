@@ -30,28 +30,46 @@ bool FileWork::IsReadOnly(std::string path) {
 	}
 }
 
-std::vector<std::string> FileWork::Input() {
-	std::vector<std::string> result;
+std::vector<size_t> FileWork::Input() {
+	std::vector<size_t> result;
 	std::ifstream file;
 	file.open(path);
 	std::string row;
 	if (file.is_open()) {
-		while (getline(file, row)) {
-			result.push_back(row);
+		for (int i = 0; i <= 1; i++) { // need only 2 params, so only 2 iterations
+			row = "";
+			getline(file, row, ';');
+			int value = std::stoi(row);
+			if (value <= 0) {
+				throw "Error";
+			}
+			result.push_back(static_cast<size_t>(value));
 		}
 	} else {
 		std::cout << "Can`t access the file.";
+		throw "Error";
+	}
+	if (result[0] > result[1]) {
+		throw "Error";
 	}
 	file.close();
 	return result;
 }
 
-void FileWork::Save(std::vector<std::string> data) {
+void FileWork::OutputSave(void(*function)(std::vector<int>, std::vector<double>, std::ostream &), std::vector<int> x, std::vector<double> y1, std::vector<double> y2) {
 	std::ofstream file;
 	file.open(path);
-	for (auto row : data) {
-		file << row << std::endl;
-	}
+	file << "Chart for Left matrix:" << std::endl << std::endl;
+	function(x, y1, file);
+	file << std::endl << "Chart for Right matrix:" << std::endl << std::endl;
+	function(x, y2, file);
+	file.close();
+}
+
+void FileWork::InputSave(size_t left, size_t right) {
+	std::ofstream file;
+	file.open(path);
+	file << left << ";" << right << std::endl;
 	file.close();
 }
 

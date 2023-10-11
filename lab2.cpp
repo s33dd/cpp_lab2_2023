@@ -15,9 +15,10 @@ std::vector<std::vector<double>> ReturnLeftMatrix(const std::vector<std::vector<
 std::vector<std::vector<double>> ReturnRightMatrix(const std::vector<std::vector<double>>& H);
 double MatrixRowsNorm(const std::vector<std::vector<double>> &M);
 void PrintMatrix(const std::vector<std::vector<double>> &M);
-void DrawChart(std::vector<int> x, std::vector<double> y);
+void DrawChart(std::vector<int> x, std::vector<double> y, std::ostream &stream);
 
 int main() {
+	setlocale(LC_CTYPE, "rus");
 	size_t leftBorder = 0;
 	size_t rightBorder = 0;
 
@@ -44,8 +45,18 @@ int main() {
                     std::cout << "File doesn`t exist." << std::endl;
                 }
             }
-            FileWork inputFile{ path };
-            //Add input
+            FileWork inputFile{ path };\
+			try {
+				std::vector<size_t> input = inputFile.Input();
+				leftBorder = input[0];
+				rightBorder = input[1];
+			}
+			catch (...) {
+				std::cout << std::endl << "There is error in values. Check if it is correct and in right format:" << std::endl;
+				std::cout << "file: leftBorder;rightBorder" << std::endl;
+				std::cout << "Make sure that left value is lower than right and both of them greater than zero." << std::endl << std::endl;
+				continue;
+			}
             break;
         }
         case InputType::MANUAL: {
@@ -73,9 +84,9 @@ int main() {
 		}
 
 		std::cout << "Chart for Left matrix:" << std::endl << std::endl;
-		DrawChart(x, leftMatrixNorms);
+		DrawChart(x, leftMatrixNorms, std::cout);
 		std::cout << std::endl << "Chart for Right matrix:" << std::endl << std::endl;
-		DrawChart(x, rightMatrixNorms);
+		DrawChart(x, rightMatrixNorms, std::cout);
 		
 
         //Ask about saves
@@ -120,7 +131,7 @@ int main() {
                 isErrors = false;
             }
             FileWork inputSaveFile{ path };
-            //Add input saving
+			inputSaveFile.InputSave(leftBorder, rightBorder);
         }
 
         switch (menu.OutputFileAsk()) {
@@ -157,7 +168,7 @@ int main() {
                 isErrors = false;
             }
             FileWork outputSaveFile{ path };
-            //Add output saving
+			outputSaveFile.OutputSave(*DrawChart, x, leftMatrixNorms, rightMatrixNorms);
         }
         }
 
@@ -338,7 +349,7 @@ void PrintMatrix(const std::vector<std::vector<double>> &M) {
 	}
 }
 
-void DrawChart(std::vector<int> x, std::vector<double> y) {
+void DrawChart(std::vector<int> x, std::vector<double> y, std::ostream &stream) {
 	std::map<int, double> tableValues;
 	size_t maxYValueSize = 0;
 	size_t maxXValueSize = 0;
@@ -403,8 +414,8 @@ void DrawChart(std::vector<int> x, std::vector<double> y) {
 
 	for (int i = 0; i < table.size(); i++) {
 		for (int j = 0; j < table[0].size(); j++) {
-			std::cout << table[i][j];
+			stream << table[i][j];
 		}
-		std::cout << std::endl;
+		stream << std::endl;
 	}
 }
