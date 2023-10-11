@@ -31,19 +31,19 @@ bool FileWork::IsReadOnly(std::string path) {
 }
 
 std::vector<std::string> FileWork::Input() {
-	std::vector<std::string> text;
+	std::vector<std::string> result;
 	std::ifstream file;
 	file.open(path);
 	std::string row;
 	if (file.is_open()) {
 		while (getline(file, row)) {
-			text.push_back(row);
+			result.push_back(row);
 		}
 	} else {
 		std::cout << "Can`t access the file.";
 	}
 	file.close();
-	return text;
+	return result;
 }
 
 void FileWork::Save(std::vector<std::string> data) {
