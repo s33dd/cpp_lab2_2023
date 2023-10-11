@@ -1,6 +1,7 @@
 ﻿#include <cmath>
 #include <iomanip>
 #include <algorithm>
+#include <sstream>
 #include <map>
 #include "menu.h"
 #include "FileWork.h"
@@ -14,7 +15,7 @@ std::vector<std::vector<double>> ReturnLeftMatrix(const std::vector<std::vector<
 std::vector<std::vector<double>> ReturnRightMatrix(const std::vector<std::vector<double>>& H);
 double MatrixRowsNorm(const std::vector<std::vector<double>> &M);
 void PrintMatrix(const std::vector<std::vector<double>> &M);
-void drawGraph(std::vector<int> x, std::vector<double> y);
+void DrawChart(std::vector<int> x, std::vector<double> y);
 
 int main() {
 	size_t leftBorder = 0;
@@ -54,6 +55,28 @@ int main() {
         }
 
         //Make work
+		std::vector<int> x;
+		std::vector<double> leftMatrixNorms;
+		std::vector<double> rightMatrixNorms;
+		for (size_t i = leftBorder; i <= rightBorder; i++) {
+			x.push_back(static_cast<int>(i));
+
+			std::vector<std::vector<double>> hilbert = ReturnHilbertMatrix(i);
+			std::vector<std::vector<double>> left = ReturnLeftMatrix(hilbert);
+			std::vector<std::vector<double>> right = ReturnRightMatrix(hilbert);
+			
+			double leftNorm = MatrixRowsNorm(left);
+			double rightNorm = MatrixRowsNorm(right);
+
+			leftMatrixNorms.push_back(leftNorm);
+			rightMatrixNorms.push_back(rightNorm);
+		}
+
+		std::cout << "Chart for Left matrix:" << std::endl << std::endl;
+		DrawChart(x, leftMatrixNorms);
+		std::cout << std::endl << "Chart for Right matrix:" << std::endl << std::endl;
+		DrawChart(x, rightMatrixNorms);
+		
 
         //Ask about saves
         bool isInputSave = false;
@@ -309,21 +332,23 @@ double MatrixRowsNorm(const std::vector<std::vector<double>>& M) {
 void PrintMatrix(const std::vector<std::vector<double>> &M) {
 	for (int i = 0; i < M.size(); i++) {
 		for (int j = 0; j < M[0].size(); j++) {
-			std::cout << (j == 0 ? "\n| " : "") << std::setw(20) << M[i][j] << (j == M[0].size() - 1 ? " |" : " ") << "\t";
+			std::cout << (j == 0 ? "\n| " : "") << std::setw(10) << M[i][j] << (j == M[0].size() - 1 ? " |" : " ") << "\t";
 		}
 		std::cout << std::endl;
 	}
 }
 
-void drawGraph(std::vector<int> x, std::vector<double> y) {
+void DrawChart(std::vector<int> x, std::vector<double> y) {
 	std::map<int, double> tableValues;
 	size_t maxYValueSize = 0;
 	size_t maxXValueSize = 0;
 
 	for (int i = 0; i < x.size(); i++) {
 		tableValues[x[i]] = y[i];
-		if (std::to_string(y[i]).size() > maxYValueSize) {
-			maxYValueSize = std::to_string(y[i]).size();
+		std::stringstream ss;
+		ss << std::scientific << y[i];
+		if (ss.str().size() > maxYValueSize) {
+			maxYValueSize = ss.str().size();
 		}
 		if (std::to_string(x[i]).size() > maxXValueSize) {
 			maxXValueSize = std::to_string(x[i]).size();
@@ -331,14 +356,16 @@ void drawGraph(std::vector<int> x, std::vector<double> y) {
 	}
 
 	std::sort(x.begin(), x.end());
-	std::sort(y.begin(), y.end());
+	std::sort(y.begin(), y.end(), std::greater<double>());
 	y.erase(std::unique(y.begin(), y.end()), y.end());
 
 	std::vector<std::vector<std::string>> table;
 
 	for (int i = 0; i < y.size(); i++) {
 		std::vector<std::string> row;
-		std::string value = std::to_string(y[i]);
+		std::stringstream ss;
+		ss << std::scientific << y[i];
+		std::string value = ss.str();
 		std::string filler = "";
 
 		filler.resize((maxYValueSize - value.size()), ' ');
@@ -350,11 +377,11 @@ void drawGraph(std::vector<int> x, std::vector<double> y) {
 			std::string mark = "*";
 			filler = "";
 			if (tableValues[x[j]] == y[i]) {
-				filler.resize(maxXValueSize - 1, ' ');
+				filler.resize(maxXValueSize, ' ');
 				mark.insert(0, filler);
 				row.push_back(mark);
 			} else {
-				filler.resize(maxXValueSize,' ');
+				filler.resize(maxXValueSize + 1,' ');
 				row.push_back(filler);
 			}
 		}
@@ -363,18 +390,18 @@ void drawGraph(std::vector<int> x, std::vector<double> y) {
 
 	std::vector<std::string> row;
 	std::string str = "";
-	str.resize(maxYValueSize, ' ');
+	str.resize(maxYValueSize + 1, ' ');
 	row.push_back(str);
 	for (int i = 0; i < x.size(); i++) {
 		std::string xValue = std::to_string(x[i]);
 		std::string filler = "";
-		filler.resize(maxXValueSize - xValue.size(), ' ');
+		filler.resize(maxXValueSize - xValue.size() + 1, ' ');
 		xValue.insert(0, filler);
 		row.push_back(xValue);
 	}
 	table.push_back(row);
 
-	for (int i = 0; i < table.size()) {
+	for (int i = 0; i < table.size(); i++) {
 		for (int j = 0; j < table[0].size(); j++) {
 			std::cout << table[i][j];
 		}
