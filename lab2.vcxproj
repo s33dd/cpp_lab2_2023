@@ -131,7 +131,7 @@
     <ClCompile Include="FileWork.cpp" />
     <ClCompile Include="lab2.cpp" />
     <ClCompile Include="menu.cpp" />
-    <ClCompile Include="menu.h" />
+    <ClInclude Include="menu.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileWork.h" />

@@ -1,5 +1,7 @@
 ﻿#include <cmath>
 #include <iomanip>
+#include <algorithm>
+#include <map>
 #include "menu.h"
 #include "FileWork.h"
 
@@ -12,7 +14,6 @@ std::vector<std::vector<double>> ReturnLeftMatrix(const std::vector<std::vector<
 std::vector<std::vector<double>> ReturnRightMatrix(const std::vector<std::vector<double>>& H);
 double MatrixRowsNorm(const std::vector<std::vector<double>> &M);
 void PrintMatrix(const std::vector<std::vector<double>> &M);
-int digitsQuantity(int number);
 void drawGraph(std::vector<int> x, std::vector<double> y);
 
 int main() {
@@ -314,20 +315,69 @@ void PrintMatrix(const std::vector<std::vector<double>> &M) {
 	}
 }
 
-int digitsQuantity(int number) {
-	if (number / 10 == 0) {
-		return 1;
-	}
-	return 1 + digitsQuantity(number / 10);
-}
-
 void drawGraph(std::vector<int> x, std::vector<double> y) {
-	std::vector<std::vector<std::string>> table;
-	for (int i = 0; i < y.size(); i++) {
-		std::vector<std::string> rows;
-		for (int j = 0; j < x.size(); j++) {
-			rows.push_back("");
+	std::map<int, double> tableValues;
+	size_t maxYValueSize = 0;
+	size_t maxXValueSize = 0;
+
+	for (int i = 0; i < x.size(); i++) {
+		tableValues[x[i]] = y[i];
+		if (std::to_string(y[i]).size() > maxYValueSize) {
+			maxYValueSize = std::to_string(y[i]).size();
 		}
-		table.push_back(rows);
+		if (std::to_string(x[i]).size() > maxXValueSize) {
+			maxXValueSize = std::to_string(x[i]).size();
+		}
+	}
+
+	std::sort(x.begin(), x.end());
+	std::sort(y.begin(), y.end());
+	y.erase(std::unique(y.begin(), y.end()), y.end());
+
+	std::vector<std::vector<std::string>> table;
+
+	for (int i = 0; i < y.size(); i++) {
+		std::vector<std::string> row;
+		std::string value = std::to_string(y[i]);
+		std::string filler = "";
+
+		filler.resize((maxYValueSize - value.size()), ' ');
+		value.insert(0, filler);
+		value += "|";
+		row.push_back(value);
+
+		for (int j = 0; j < x.size(); j++) {
+			std::string mark = "*";
+			filler = "";
+			if (tableValues[x[j]] == y[i]) {
+				filler.resize(maxXValueSize - 1, ' ');
+				mark.insert(0, filler);
+				row.push_back(mark);
+			} else {
+				filler.resize(maxXValueSize,' ');
+				row.push_back(filler);
+			}
+		}
+		table.push_back(row);
+	}
+
+	std::vector<std::string> row;
+	std::string str = "";
+	str.resize(maxYValueSize, ' ');
+	row.push_back(str);
+	for (int i = 0; i < x.size(); i++) {
+		std::string xValue = std::to_string(x[i]);
+		std::string filler = "";
+		filler.resize(maxXValueSize - xValue.size(), ' ');
+		xValue.insert(0, filler);
+		row.push_back(xValue);
+	}
+	table.push_back(row);
+
+	for (int i = 0; i < table.size()) {
+		for (int j = 0; j < table[0].size(); j++) {
+			std::cout << table[i][j];
+		}
+		std::cout << std::endl;
 	}
 }
