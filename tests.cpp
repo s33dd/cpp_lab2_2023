@@ -3,7 +3,6 @@
 
 bool IsUnit(const std::vector<std::vector<double>> &M);
 
-//Question: if program meaning is to show arithemtical error of PC double computation, then what if 0 is expected and a value like 0.1e-15 is obtained
 void Tests::MakeTests() {
 	const int testsQuantity = 5;
 	int count = 0;
@@ -53,11 +52,11 @@ bool IsUnit(const std::vector<std::vector<double>> &M) {
 	for (int i = 0; i < M.size(); i++) {
 		for (int j = 0; j < M[0].size(); j++) {
 			if (i == j) {
-				if (M[i][j] != 1.0) {
+				if (round(M[i][j]) != 1.0) {
 					return false;
 				}
 			} else {
-				if (M[i][j] != 0.0) {
+				if (round(M[i][j]) != 0.0) {
 					return false;
 				}
 			}
